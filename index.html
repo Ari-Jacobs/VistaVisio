@@ -7,13 +7,13 @@
 
 <meta name="description" content="VistaVisio: an immersive, spatially-accurate 3D Gaussian Splatting reconstruction of the UCSB campus, navigable in a web browser or on Apple Vision Pro." />
 <meta property="og:title" content="VistaVisio — Immersive 3D Reconstruction of UCSB Campus" />
-<meta property="og:description" content="A spatially-accurate 3D model of UCSB built from ground and aerial imagery, RTK GPS, 3D Reconstruction, and 3D Gaussian Splatting." />
+<meta property="og:description" content="A spatially-accurate 3D model of UCSB built from ground and aerial imagery, RTK GPS, and 3D Gaussian Splatting." />
 <meta property="og:type" content="website" />
 
 <!-- =========================  FONTS  ========================= -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400&display=swap" />
 
 <!-- Font Awesome for link badges -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -21,22 +21,13 @@
 <style>
   /* =========================  TOKENS  ========================= */
   :root {
-    --bg:           #fafaf7;
-    --surface:      #ffffff;
-    --ink:          #131312;
-    --ink-soft:     #45443f;
-    --muted:        #8a8a82;
-    --rule:         #e6e2d8;
-    --accent:       #003660;  /* UCSB navy */
-    --accent-2:     #1a4e85;  /* lighter navy */
-    --accent-soft:  #eaf0f6;
-    --gold:         #b88a2c;  /* muted UCSB gold for tiny accents */
-    --button-bg:    #131312;
-    --button-fg:    #fafaf7;
-    --button-hover: #003660;
-    --max-width:    980px;
-    --content:      760px;
-    --radius:       14px;
+    --bg:        #ffffff;
+    --ink:       #111111;
+    --ink-soft:  #3a3a3a;
+    --muted:     #777777;
+    --rule:      #e5e5e5;
+    --max-width: 980px;
+    --content:   720px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,126 +42,78 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* =========================  SOFT ATMOSPHERIC TEXTURE  ========================= */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background-image:
-      radial-gradient(circle at 22% 18%, rgba(0,54,96,0.05), transparent 55%),
-      radial-gradient(circle at 80% 78%, rgba(184,138,44,0.04), transparent 55%);
-  }
-
   /* =========================  LAYOUT  ========================= */
-  .wrap   { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
+  .wrap   { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; }
   .narrow { max-width: var(--content);   margin: 0 auto; }
 
   /* =========================  HEADER  ========================= */
-  header.hero { padding: 72px 0 36px; text-align: center; }
+  header.hero { padding: 64px 0 28px; text-align: center; }
   .conference {
     display: inline-block;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12.5px;
-    letter-spacing: 0.22em;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 5px 14px;
-    border-radius: 999px;
-    margin-bottom: 28px;
+    color: var(--muted);
+    margin-bottom: 22px;
   }
   h1.title {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(40px, 7vw, 72px);
-    line-height: 1.02;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 52px);
+    line-height: 1.1;
     letter-spacing: -0.02em;
-    margin-bottom: 14px;
-    font-variation-settings: "opsz" 144, "SOFT" 30;
-  }
-  h1.title .method {
-    font-style: italic;
-    font-weight: 600;
-    color: var(--accent);
+    margin-bottom: 10px;
   }
   h1.title .sub-line {
     display: block;
-    font-size: 0.42em;
+    font-size: 0.5em;
     font-weight: 400;
-    font-style: normal;
     color: var(--ink-soft);
     letter-spacing: -0.01em;
-    margin-top: 14px;
-    font-variation-settings: "opsz" 60, "SOFT" 20;
+    margin-top: 12px;
   }
   .tagline {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-style: italic;
-    font-size: clamp(17px, 2vw, 20px);
+    font-size: 15px;
     color: var(--muted);
-    margin-bottom: 36px;
-    font-variation-settings: "opsz" 24;
+    margin-bottom: 28px;
   }
 
   /* =========================  AUTHORS  ========================= */
   .authors {
-    display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 4px 18px;
-    margin-bottom: 12px;
     font-size: 16px;
-  }
-  .authors a, .authors span.author {
     color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
-  }
-  .authors a:hover { border-bottom-color: var(--accent); }
-  .authors sup { font-size: 0.7em; color: var(--accent); margin-left: 1px; }
-  .team-label {
-    display: block;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 14px 0 6px;
+    margin-bottom: 8px;
   }
   .affil {
     color: var(--muted);
     font-size: 14.5px;
-    margin: 16px 0 0;
+    margin: 8px 0 0;
   }
-  .affil sup { color: var(--accent); margin-right: 2px; }
 
   /* =========================  LINK BUTTONS  ========================= */
   .links {
     display: flex; flex-wrap: wrap; justify-content: center;
     gap: 10px;
-    margin: 30px 0 8px;
+    margin: 28px 0 8px;
   }
   .links a {
     display: inline-flex; align-items: center; gap: 9px;
-    background: var(--button-bg);
-    color: var(--button-fg);
-    padding: 11px 22px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 20px;
     border-radius: 999px;
     font-size: 14.5px;
     font-weight: 500;
     text-decoration: none;
-    transition: background 0.15s, transform 0.15s;
+    transition: opacity 0.15s;
   }
-  .links a:hover { background: var(--button-hover); transform: translateY(-1px); }
-  .links a i { font-size: 15px; }
+  .links a:hover { opacity: 0.78; }
+  .links a i { font-size: 14px; }
 
   /* =========================  TEASER  ========================= */
   .teaser {
-    margin: 56px 0 24px;
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--surface);
+    margin: 48px 0 20px;
     border: 1px solid var(--rule);
     aspect-ratio: 16 / 9;
     display: grid; place-items: center;
@@ -183,24 +126,20 @@
     color: var(--muted);
     font-size: 14px;
     margin: 8px 0 0;
-    font-style: italic;
   }
 
   /* =========================  SECTIONS  ========================= */
-  section { padding: 48px 0; }
+  section { padding: 44px 0; }
   h2.section-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(26px, 3.6vw, 34px);
+    font-weight: 700;
+    font-size: clamp(24px, 3vw, 30px);
     letter-spacing: -0.01em;
-    margin-bottom: 22px;
-    font-variation-settings: "opsz" 60, "SOFT" 20;
+    margin-bottom: 20px;
   }
-  h2.section-title .accent { color: var(--accent); font-style: italic; }
-  section p { margin-bottom: 16px; color: var(--ink-soft); }
+  section p { margin-bottom: 14px; color: var(--ink-soft); }
   section p:last-child { margin-bottom: 0; }
-  section a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
-  section a:hover { border-bottom-color: var(--accent); }
+  section a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  section a:hover { color: var(--muted); }
 
   .rule { height: 1px; background: var(--rule); margin: 0; }
 
@@ -208,74 +147,47 @@
   .two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 36px;
-    margin-top: 12px;
+    gap: 32px;
+    margin-top: 8px;
   }
   .two-col h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 22px;
-    margin-bottom: 12px;
-    font-variation-settings: "opsz" 30;
+    font-weight: 600;
+    font-size: 19px;
+    margin-bottom: 10px;
   }
   .two-col .col-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--muted);
     margin-bottom: 6px;
     display: block;
   }
-  .two-col .col-tag.solution { color: var(--gold); }
-  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; gap: 28px; } }
-
-  /* =========================  METHOD FIGURE  ========================= */
-  .figure {
-    margin: 24px 0 12px;
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--rule);
-  }
-  .figure img { width: 100%; height: auto; display: block; }
-  .figure-placeholder {
-    aspect-ratio: 16 / 9;
-    display: grid; place-items: center;
-    color: var(--muted);
-    font-size: 14px;
-    background:
-      linear-gradient(135deg, transparent 49%, var(--rule) 49.5%, var(--rule) 50.5%, transparent 51%),
-      var(--surface);
-    background-size: 22px 22px;
-  }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
 
   /* =========================  PIPELINE BLOCK DIAGRAM  ========================= */
   .pipeline {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    margin: 28px 0 12px;
+    margin: 24px 0 10px;
   }
   .pipeline .step {
-    background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: 10px;
     padding: 14px 12px;
     text-align: center;
-    position: relative;
   }
   .pipeline .step .num {
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
     letter-spacing: 0.14em;
-    color: var(--gold);
+    color: var(--muted);
     display: block;
     margin-bottom: 4px;
   }
   .pipeline .step .label {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 15px;
     line-height: 1.2;
     color: var(--ink);
@@ -297,18 +209,16 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 0;
-    margin: 28px 0;
+    margin: 24px 0;
     border-top: 1px solid var(--rule);
     border-bottom: 1px solid var(--rule);
   }
   .stat { padding: 22px 18px; text-align: center; border-right: 1px solid var(--rule); }
   .stat:last-child { border-right: 0; }
   .stat .num {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 30px;
+    font-weight: 700;
+    font-size: 28px;
     color: var(--ink);
-    font-variation-settings: "opsz" 36;
     display: block;
     line-height: 1.1;
   }
@@ -331,155 +241,104 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 18px;
-    margin-top: 28px;
+    margin-top: 24px;
   }
   .card {
-    background: var(--surface);
     border: 1px solid var(--rule);
-    border-radius: var(--radius);
     overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     display: flex; flex-direction: column;
     position: relative;
+    transition: border-color 0.15s;
   }
-  .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px -16px rgba(0,54,96,0.22);
-    border-color: var(--accent);
-  }
+  .card:hover { border-color: var(--ink); }
   .card .thumb {
     aspect-ratio: 4 / 3;
-    background: linear-gradient(135deg, #d8e1ea, #b8c5d4);
+    background: #f2f2f2;
     position: relative;
     overflow: hidden;
   }
   .card .thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .card .thumb::after {
-    content: "";
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 60%);
-    pointer-events: none;
-  }
   .card .status {
     position: absolute;
-    top: 12px; right: 12px;
+    top: 10px; right: 10px;
     background: var(--bg);
     border: 1px solid var(--rule);
     color: var(--ink-soft);
-    padding: 4px 10px;
-    border-radius: 999px;
+    padding: 3px 9px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     z-index: 2;
   }
-  .card .status.live { background: var(--accent); color: white; border-color: var(--accent); }
-  .card .status.wip  { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-  .card-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+  .card-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
   .card h3 {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
-    font-size: 20px;
+    font-weight: 600;
+    font-size: 18px;
     margin-bottom: 6px;
-    font-variation-settings: "opsz" 24;
   }
   .card .meta {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--muted);
     letter-spacing: 0.04em;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-  .card .desc { font-size: 14.5px; color: var(--ink-soft); flex: 1; margin-bottom: 14px; line-height: 1.55; }
+  .card .desc { font-size: 14.5px; color: var(--ink-soft); flex: 1; margin-bottom: 12px; line-height: 1.55; }
   .card .open {
     display: inline-flex; align-items: center; gap: 8px;
-    color: var(--accent);
+    color: var(--ink);
     font-size: 14px;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
     align-self: flex-start;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.15s;
   }
-  .card .open:hover { border-bottom-color: var(--accent); }
-  .card .open.disabled { color: var(--muted); pointer-events: none; }
-
-  /* =========================  TEAM SECTION  ========================= */
-  .team-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    margin-top: 12px;
-  }
-  .team-block h4 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--rule);
-  }
-  .team-block ul { list-style: none; }
-  .team-block li {
-    padding: 7px 0;
-    color: var(--ink-soft);
-    font-size: 15.5px;
-  }
-  .team-block li .role {
-    font-size: 12.5px;
-    color: var(--muted);
-    margin-left: 6px;
-    font-style: italic;
-  }
-  @media (max-width: 640px) { .team-grid { grid-template-columns: 1fr; } }
+  .card .open:hover { color: var(--muted); }
+  .card .open.disabled { color: var(--muted); pointer-events: none; text-decoration: none; }
 
   /* =========================  CITATION  ========================= */
   pre.bibtex {
-    background: var(--surface);
+    background: #fafafa;
     border: 1px solid var(--rule);
-    border-radius: var(--radius);
-    padding: 22px 24px;
+    padding: 20px 22px;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 13.5px;
     line-height: 1.55;
     color: var(--ink-soft);
     overflow-x: auto;
-    margin-top: 18px;
+    margin-top: 16px;
     position: relative;
   }
   .copy-btn {
     position: absolute;
-    top: 12px; right: 12px;
+    top: 10px; right: 10px;
     background: var(--bg);
     border: 1px solid var(--rule);
     color: var(--ink-soft);
-    padding: 5px 11px;
+    padding: 4px 10px;
     font-size: 12px;
-    border-radius: 8px;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
   }
-  .copy-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .copy-btn:hover { border-color: var(--ink); color: var(--ink); }
 
   /* =========================  FOOTER  ========================= */
   footer {
-    padding: 56px 0 80px;
+    padding: 48px 0 64px;
     text-align: center;
     color: var(--muted);
     font-size: 14px;
     border-top: 1px solid var(--rule);
-    margin-top: 32px;
+    margin-top: 28px;
   }
-  footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule); }
-  footer a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  footer a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  footer a:hover { color: var(--muted); }
 
   @media (max-width: 600px) {
-    header.hero { padding: 48px 0 24px; }
-    section { padding: 36px 0; }
-    .links a { padding: 10px 18px; font-size: 13.5px; }
+    header.hero { padding: 44px 0 20px; }
+    section { padding: 32px 0; }
+    .links a { padding: 9px 16px; font-size: 13.5px; }
   }
 </style>
 </head>
@@ -494,41 +353,27 @@
     <span class="conference">UCSB Senior Capstone · Spring 2026</span>
 
     <h1 class="title">
-      <span class="method">VistaVisio</span>
+      VistaVisio
       <span class="sub-line">An Immersive 3D Reconstruction of the UCSB Campus</span>
     </h1>
 
     <p class="tagline">drone &amp; ground imagery · centimeter-accurate RTK GPS · 3D Gaussian Splatting</p>
 
-    <span class="team-label">Computer Engineering</span>
-    <div class="authors">
-      <span class="author">Ari Jacobs<sup>1</sup></span>
-      <span class="author">Jeffery Wang<sup>1</sup></span>
-      <span class="author">Saul Diaz<sup>1</sup></span>
-      <span class="author">Kevin Hernandez<sup>1</sup></span>
-      <span class="author">Guntash Gill<sup>1</sup></span>
-    </div>
-
-    <span class="team-label">Electrical Engineering</span>
-    <div class="authors">
-      <span class="author">Preston Tran<sup>2</sup></span>
-      <span class="author">Nathan Nhieu<sup>2</sup></span>
-      <span class="author">Jason Li<sup>2</sup></span>
-      <span class="author">Joshua Liu<sup>2</sup></span>
-    </div>
-
-    <p class="affil">
-      <sup>1</sup>Department of Electrical &amp; Computer Engineering &nbsp;·&nbsp;
-      University of California, Santa Barbara
+    <p class="authors">
+      <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#777;display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">Computer Engineering</span>
+      Ari Jacobs, Jeffery Wang, Saul Diaz, Kevin Hernandez, Guntash Gill
     </p>
+    <p class="authors" style="margin-top:10px;">
+      <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#777;display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">Electrical Engineering</span>
+      Preston Tran, Nathan Nhieu, Jason Li, Joshua Liu
+    </p>
+    <p class="affil">University of California, Santa Barbara</p>
 
-    <!-- LINK BUTTONS -->
     <div class="links">
-      <a href="VistaVisio_DesignDoc.pdf" target="_blank" rel="noopener"><i class="fa-solid fa-file-pdf"></i> Design Doc</a>
-      <a href="https://github.com/YOUR-USER/vistavisio" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Code</a>
-      <a href="#reconstructions"><i class="fa-solid fa-cube"></i> Live Splats</a>
+      <a href="3D_Virtual_UCSB___Milestone_4_Prelim.pdf" target="_blank" rel="noopener"><i class="fa-solid fa-file-pdf"></i> Design Doc</a>
+      <a href="https://github.com/Ari-Jacobs/VistaVisio" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Code</a>
+      <a href="#reconstructions"><i class="fa-solid fa-cube"></i> Live Splats and Point Cloud Videos</a>
       <a href="#method"><i class="fa-solid fa-diagram-project"></i> Method</a>
-      <a href="#team"><i class="fa-solid fa-users"></i> Team</a>
     </div>
   </div>
 </header>
@@ -538,17 +383,9 @@
      ============================================================ -->
 <div class="wrap">
   <div class="teaser">
-    <div style="text-align:center; padding: 24px;">
-      <i class="fa-solid fa-film" style="font-size:32px; opacity:0.4; margin-bottom:10px; display:block;"></i>
-      Teaser video / hero render goes here<br/>
-      <small style="opacity:0.7;">(16:9 fly-through of the merged campus splat)</small>
-    </div>
-    <!--
-      Replace the placeholder above with:
-      <video autoplay loop muted playsinline>
-        <source src="videos/teaser.mp4" type="video/mp4">
-      </video>
-    -->
+    <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+      <source src="videos/bus_loop_cut.mp4" type="video/mp4">
+    </video>
   </div>
   <p class="caption">A fly-through of the merged Gaussian splat across UCSB.</p>
 </div>
@@ -558,7 +395,7 @@
      ============================================================ -->
 <section id="why">
   <div class="wrap narrow">
-    <h2 class="section-title">Why <span class="accent">VistaVisio</span>?</h2>
+    <h2 class="section-title">Why VistaVisio?</h2>
 
     <div class="two-col">
       <div>
@@ -574,10 +411,10 @@
       </div>
 
       <div>
-        <span class="col-tag solution">Our Solution</span>
+        <span class="col-tag">Our Solution</span>
         <h3>An immersive, spatially-accurate 3D model.</h3>
         <p>
-          <em>VistaVisio</em> lets users explore and navigate UCSB as if they were actually there — in a
+          VistaVisio lets users explore and navigate UCSB as if they were actually there — in a
           web browser or through virtual reality on Apple Vision Pro. By preserving both visual
           fidelity and real-world scale, aligned to geographic coordinates, the platform delivers an
           experience that satellite imagery and street-view tools cannot. Students, professors, and
@@ -618,7 +455,7 @@
      ============================================================ -->
 <section id="method">
   <div class="wrap narrow">
-    <h2 class="section-title"><span class="accent">Method</span> overview</h2>
+    <h2 class="section-title">Method overview</h2>
     <p>
       Images are captured per-building using iPhones mounted alongside EMLID Rx2 RTK GPS
       receivers (centimeter-level accuracy) and supplemented with aerial imagery from Wingtra
@@ -636,12 +473,12 @@
       reconstructions into a shared geo-referenced frame.
     </p>
     <p>
-      For dense reconstruction we use <strong>gsplat</strong> for the majority of campus and
-      <strong>GaussianPlant</strong> for vegetation-heavy regions like the lawns and tree
-      canopies. Per-building splats are merged into the global coordinate frame using GPS
-      alignment, with low-opacity and oversized Gaussians filtered out and a 0.05 m voxel-grid
-      pruning step to remove duplicates in overlap regions. The final model is delivered to
-      users through a Unity WebGL viewer and a Unity → PolySpatial pipeline for Apple Vision Pro.
+      For dense reconstruction we use gsplat for the majority of campus and GaussianPlant for
+      vegetation-heavy regions like the lawns and tree canopies. Per-building splats are merged
+      into the global coordinate frame using GPS alignment, with low-opacity and oversized
+      Gaussians filtered out and a 0.05 m voxel-grid pruning step to remove duplicates in
+      overlap regions. The final model is delivered to users through a Unity WebGL viewer and 
+      through a third-party app (MetalSplat) for Apple Vision Pro.
     </p>
 
     <!-- Pipeline diagram -->
@@ -681,13 +518,13 @@
 <!-- ============================================================
      STATS BAND
      ============================================================ -->
-<section style="padding-top: 32px; padding-bottom: 16px;">
+<section style="padding-top: 28px; padding-bottom: 12px;">
   <div class="wrap">
     <div class="stats">
-      <div class="stat"><span class="num">9</span><span class="lbl">Team Members</span></div>
-      <div class="stat"><span class="num">25+</span><span class="lbl">Buildings Captured</span></div>
+      <div class="stat"><span class="lbl">Entire Campus Captured via Wingtra drone</span></div>
+      <div class="stat"><span class="num">35+</span><span class="lbl">Buildings Captured w/ Ground-Level EMLID shots</span></div>
       <div class="stat"><span class="num">~1 cm</span><span class="lbl">RTK GPS Accuracy</span></div>
-      <div class="stat"><span class="num">0.29 m</span><span class="lbl">Merged Alignment Error</span></div>
+      <div class="stat"><span class="num">~0.25 m</span><span class="lbl">Merged Alignment Error</span></div>
     </div>
   </div>
 </section>
@@ -697,7 +534,7 @@
      ============================================================ -->
 <section id="reconstructions">
   <div class="wrap">
-    <div class="narrow" style="margin-bottom: 18px;">
+    <div class="narrow" style="margin-bottom: 16px;">
       <h2 class="section-title">Interactive reconstructions</h2>
       <p>
         Click any building to open its interactive Gaussian splat viewer. Rendering runs
@@ -707,105 +544,93 @@
     </div>
 
     <div class="gallery">
-      <article class="card">
-        <div class="thumb">
-          <span class="status live">Live</span>
-        </div>
-        <div class="card-body">
-          <h3>Kavli Hall</h3>
-          <p class="meta">3DGS · GROUND CAPTURE</p>
-          <p class="desc">Two-story brick façade with mixed indoor-outdoor walkway lighting. Strong test case for handling glass entrances and shaded archways.</p>
-          <a class="open" href="https://splatter.app/s/ihr-f09" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </article>
+
+      <!-- ── GAUSSIAN SPLATS ──────────────────────────────────── -->
 
       <article class="card">
         <div class="thumb">
-          <span class="status live">Live</span>
-        </div>
-        <div class="card-body">
-          <h3>Chemistry &amp; PSBN Hall</h3>
-          <p class="meta">3DGS · GROUND CAPTURE</p>
-          <p class="desc">Long linear façade flanked by tall pines and a wide lawn — combined gsplat + GaussianPlant pass for the surrounding greenery.</p>
-          <a class="open" href="https://splatter.app/s/6mt-svp" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="thumb">
-          <span class="status wip">Training</span>
-        </div>
-        <div class="card-body">
-          <h3>Ellison Hall</h3>
-          <p class="meta">3DGS · IN OPTIMIZATION</p>
-          <p class="desc">Sparse and dense COLMAP reconstructions complete; Gaussian splat currently optimizing. Hosted viewer coming soon.</p>
-          <a class="open disabled" href="#">Viewer pending <i class="fa-solid fa-clock"></i></a>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="thumb">
-          <span class="status wip">Merging</span>
-        </div>
-        <div class="card-body">
-          <h3>Engineering &amp; Sciences Cluster</h3>
-          <p class="meta">6 BUILDINGS · 944 IMAGES · 246K POINTS</p>
-          <p class="desc">Merged reconstruction of MRL, Harold Frank Hall, Phelps, ESB, Marine Science, and Ocean Science — aligned via Umeyama + GPS priors at 0.29 m accuracy.</p>
-          <a class="open disabled" href="#">Viewer pending <i class="fa-solid fa-clock"></i></a>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="thumb">
-          <span class="status wip">Sparse</span>
+          <img src="img/kitp.png" alt="Kavli Institute (KITP)">
+          <span class="status">Gaussian Splat</span>
         </div>
         <div class="card-body">
           <h3>Kavli Institute (KITP)</h3>
-          <p class="meta">SPARSE POINT CLOUD</p>
-          <p class="desc">Sparse SfM reconstruction completed — recognizable from KITP's distinctive courtyard geometry. Dense pass not required for current milestone.</p>
-          <a class="open disabled" href="#">Viewer pending <i class="fa-solid fa-clock"></i></a>
+          <p class="meta">3DGS · GROUND CAPTURE</p>
+          <p class="desc">Full Gaussian splat of KITP's distinctive courtyard complex, reconstructed from ground-level imagery.</p>
+          <a class="open" href="https://splatter.app/s/us6-756" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </article>
 
       <article class="card">
         <div class="thumb">
-          <span class="status wip">Dense</span>
+          <img src="img/hfh_mrl.png" alt="Harold Frank Hall and MRL">
+          <span class="status">Gaussian Splat</span>
         </div>
         <div class="card-body">
-          <h3>North Hall</h3>
-          <p class="meta">COLMAP DENSE MVS</p>
-          <p class="desc">Sparse + dense COLMAP reconstruction completed; awaiting Gaussian Splatting pass. One of the highest-density meshes in the dataset.</p>
-          <a class="open disabled" href="#">Viewer pending <i class="fa-solid fa-clock"></i></a>
+          <h3>Harold Frank Hall &amp; MRL</h3>
+          <p class="meta">3DGS · MERGED · GROUND CAPTURE</p>
+          <p class="desc">Merged Gaussian splat of Harold Frank Hall and the Materials Research Lab, two of the core engineering buildings on campus.</p>
+          <a class="open" href="https://splatter.app/s/x6v-4l8" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </article>
+
+      <article class="card">
+        <div class="thumb">
+          <img src="img/drone_east.png" alt="East Campus Drone">
+          <span class="status">Gaussian Splat</span>
+        </div>
+        <div class="card-body">
+          <h3>East Campus (Drone)</h3>
+          <p class="meta">3DGS · AERIAL CAPTURE</p>
+          <p class="desc">Aerial Gaussian splat of the east side of campus captured from drone imagery, covering rooftops and building exteriors not visible from the ground.</p>
+          <a class="open" href="https://splatter.app/s/phf-mg9" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+
+      <!-- ── POINT CLOUDS ─────────────────────────────────────── -->
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/drone_east_walk_cut.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>East Side of Campus</h3>
+          <p class="meta">SPARSE · COLMAP</p>
+          <p class="desc">Sparse point cloud reconstruction using Wingtra drone footage of East Side of Campus.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/drone_sparse.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>Entire Campus</h3>
+          <p class="meta">SPARSE · COLMAP</p>
+          <p class="desc">Sparse point cloud reconstruction of all Wingtra drone flight paths and most buildings we collected ground-level + DJI drone data for.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/kitp_cut.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>Point Cloud 3</h3>
+          <p class="meta">DENSE · COLMAP</p>
+          <p class="desc">Dense point cloud reconstruction of Kavli Institude of Theoretical Physics.</p>
+        </div>
+      </article>
+
     </div>
-  </div>
-</section>
-
-<div class="rule"></div>
-
-<!-- ============================================================
-     RESULTS  —  before/after merging demo
-     ============================================================ -->
-<section id="results">
-  <div class="wrap narrow">
-    <h2 class="section-title">Results</h2>
-    <p>
-      We validated the GPS-based merging pipeline by splitting Harold Frank Hall into three
-      sub-datasets, reconstructing each separately, and merging them. The merged reconstruction
-      lowered GPS alignment error from 0.245 m to 0.210 m and recovered 12 additional images
-      that single-pass COLMAP had failed to register. Scaling the merge to six buildings across
-      central UCSB yielded an average alignment error of <strong>0.29 m</strong> with
-      <strong>98.80% RANSAC inliers</strong> across 944 registered images.
-    </p>
-
-    <div class="figure">
-      <div class="figure-placeholder">
-        Side-by-side: per-building splats vs. merged campus splat
-        (replace with <code>&lt;img&gt;</code> or <code>&lt;video&gt;</code>)
-      </div>
-    </div>
-    <p class="caption">Six-building merge demonstrates GPS-aligned splat integration at sub-meter accuracy.</p>
   </div>
 </section>
 
@@ -819,12 +644,10 @@
     <h2 class="section-title">Citation</h2>
     <pre class="bibtex" id="bibtex"><button class="copy-btn" onclick="copyBibtex()">Copy</button>@misc{vistavisio2026,
   title  = {VistaVisio: An Immersive 3D Reconstruction of the UCSB Campus},
-  author = {Jacobs, Ari and Wang, Jeffery and Diaz, Saul and
-            Hernandez, Kevin and Gill, Guntash and Tran, Preston and
-            Nhieu, Nathan and Li, Jason and Liu, Joshua},
+  author = {Jacobs, Ari and Wang, Jeffery and Diaz, Saul and Hernandez, Kevin and Gill, Guntash and Tran, Preston and Nhieu, Nathan and Li, Jason and Liu, Joshua},
   year   = {2026},
   note   = {Senior capstone project, University of California, Santa Barbara},
-  url    = {https://your-user.github.io/vistavisio}
+  url    = {https://ari-jacobs.github.io/VistaVisio/}
 }</pre>
   </div>
 </section>
@@ -838,24 +661,21 @@
   <div class="wrap narrow">
     <h2 class="section-title">Acknowledgements</h2>
     <p>
-      We thank our Prof. Yogananda Isukapalli, Prof. Ilan Ben-Yaacov, Prof. B.S. Manjunath, 
-      Chandrakanth Gudavalli, Charvi Mendiratta, and many more for providing resources, 
-      without which campus-scale Gaussian Splatting would not have been possible.
-      We are grateful to the UCSB Department of Computer Engineering and the Department of
-      Electrical &amp; Computer Engineering for supporting equipment costs, including the
-      EMLID Rx2 GPS receiver and the Apple Vision Pro headset used for VR deployment.
+      We thank Professor B.S. Manjunath, Chandrakanth Gudavalli, Charvi Mendiratta, Prof. Yoga Isukapalli, 
+      Prof. Ilan Ben-Yaacov, the UCSB ML Lab, and many more for providing resources and support throughout
+      this project. We are grateful to UCSB ECE Department and IFT for supporting equipment costs, 
+      including the EMLID Rx2 RTK GPS receiver and the Apple Vision Pro headset used for VR deployment.
     </p>
     <p>
       VistaVisio builds on a broad ecosystem of open-source work, including
       <a href="https://colmap.github.io/" target="_blank" rel="noopener">COLMAP</a>,
       <a href="https://github.com/cvg/Hierarchical-Localization" target="_blank" rel="noopener">HLOC</a>,
       <a href="https://github.com/magicleap/SuperGluePretrainedNetwork" target="_blank" rel="noopener">SuperPoint &amp; SuperGlue</a>,
-      <a href="https://github.com/nerfstudio-project/gsplat" target="_blank" rel="noopener">gsplat</a>,
-      <a href="https://github.com/city-super/Octree-GS" target="_blank" rel="noopener">Octree-GS</a>, and
+      <a href="https://github.com/nerfstudio-project/gsplat" target="_blank" rel="noopener">gsplat</a>, and
       <a href="https://arxiv.org/abs/2512.14087" target="_blank" rel="noopener">GaussianPlant</a>.
     </p>
-    <p style="font-size: 14px; color: var(--muted); margin-top: 22px;">
-      Page template inspired by <a href="https://reconfusion.github.io/" target="_blank" rel="noopener" style="color:var(--ink-soft);">ReconFusion</a>.
+    <p style="font-size: 14px; color: var(--muted); margin-top: 18px;">
+      Page template inspired by <a href="https://reconfusion.github.io/" target="_blank" rel="noopener">ReconFusion</a>.
     </p>
   </div>
 </section>
@@ -865,7 +685,7 @@
      ============================================================ -->
 <footer>
   <div class="wrap">
-    <p>© 2026 VistaVisio Team · UC Santa Barbara · <a href="https://github.com/YOUR-USER/vistavisio">Source on GitHub</a></p>
+    <p>© 2026 VistaVisio Team · UC Santa Barbara · <a href="https://github.com/Ari-Jacobs/VistaVisio">Source on GitHub</a></p>
   </div>
 </footer>
 
