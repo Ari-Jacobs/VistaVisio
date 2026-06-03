@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VistaVisio — Immersive 3D Reconstruction of UCSB Campus</title>
+
+<meta name="description" content="VistaVisio: an immersive, spatially-accurate 3D Gaussian Splatting reconstruction of the UCSB campus, navigable in a web browser or on Apple Vision Pro." />
+<meta property="og:title" content="VistaVisio — Immersive 3D Reconstruction of UCSB Campus" />
+<meta property="og:description" content="A spatially-accurate 3D model of UCSB built from ground and aerial imagery, RTK GPS, and 3D Gaussian Splatting." />
+<meta property="og:type" content="website" />
+
+<!-- =========================  FONTS  ========================= -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400&display=swap" />
+
+<!-- Font Awesome for link badges -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+  /* =========================  TOKENS  ========================= */
+  :root {
+    --bg:        #ffffff;
+    --ink:       #111111;
+    --ink-soft:  #3a3a3a;
+    --muted:     #777777;
+    --rule:      #e5e5e5;
+    --max-width: 980px;
+    --content:   720px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* =========================  LAYOUT  ========================= */
+  .wrap   { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; }
+  .narrow { max-width: var(--content);   margin: 0 auto; }
+
+  /* =========================  HEADER  ========================= */
+  header.hero { padding: 64px 0 28px; text-align: center; }
+  .conference {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+  h1.title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  h1.title .sub-line {
+    display: block;
+    font-size: 0.5em;
+    font-weight: 400;
+    color: var(--ink-soft);
+    letter-spacing: -0.01em;
+    margin-top: 12px;
+  }
+  .tagline {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* =========================  AUTHORS  ========================= */
+  .authors {
+    font-size: 16px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .affil {
+    color: var(--muted);
+    font-size: 14.5px;
+    margin: 8px 0 0;
+  }
+
+  /* =========================  LINK BUTTONS  ========================= */
+  .links {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 10px;
+    margin: 28px 0 8px;
+  }
+  .links a {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 14.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .links a:hover { opacity: 0.78; }
+  .links a i { font-size: 14px; }
+
+  /* =========================  TEASER  ========================= */
+  .teaser {
+    margin: 48px 0 20px;
+    border: 1px solid var(--rule);
+    aspect-ratio: 16 / 9;
+    display: grid; place-items: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .teaser video, .teaser img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 8px 0 0;
+  }
+
+  /* =========================  SECTIONS  ========================= */
+  section { padding: 44px 0; }
+  h2.section-title {
+    font-weight: 700;
+    font-size: clamp(24px, 3vw, 30px);
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  section p { margin-bottom: 14px; color: var(--ink-soft); }
+  section p:last-child { margin-bottom: 0; }
+  section a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+  section a:hover { color: var(--muted); }
+
+  .rule { height: 1px; background: var(--rule); margin: 0; }
+
+  /* =========================  TWO-COL PROBLEM/SOLUTION  ========================= */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 8px;
+  }
+  .two-col h3 {
+    font-weight: 600;
+    font-size: 19px;
+    margin-bottom: 10px;
+  }
+  .two-col .col-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
+
+  /* =========================  PIPELINE BLOCK DIAGRAM  ========================= */
+  .pipeline {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 24px 0 10px;
+  }
+  .pipeline .step {
+    border: 1px solid var(--rule);
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .pipeline .step .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .pipeline .step .label {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .pipeline .step .tool {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 6px;
+    display: block;
+    word-break: break-word;
+  }
+  @media (max-width: 720px) {
+    .pipeline { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* =========================  STATS BAND  ========================= */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0;
+    margin: 24px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .stat { padding: 22px 18px; text-align: center; border-right: 1px solid var(--rule); }
+  .stat:last-child { border-right: 0; }
+  .stat .num {
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--ink);
+    display: block;
+    line-height: 1.1;
+  }
+  .stat .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+    display: block;
+  }
+  @media (max-width: 640px) {
+    .stat { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .stat:last-child { border-bottom: 0; }
+  }
+
+  /* =========================  RECONSTRUCTION GALLERY  ========================= */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin-top: 24px;
+  }
+  .card {
+    border: 1px solid var(--rule);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--ink); }
+  .card .thumb {
+    aspect-ratio: 4 / 3;
+    background: #f2f2f2;
+    position: relative;
+    overflow: hidden;
+  }
+  .card .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .card .status {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 3px 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .card-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+  .card h3 {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .card .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .card .desc { font-size: 14.5px; color: var(--ink-soft); flex: 1; margin-bottom: 12px; line-height: 1.55; }
+  .card .open {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    align-self: flex-start;
+  }
+  .card .open:hover { color: var(--muted); }
+  .card .open.disabled { color: var(--muted); pointer-events: none; text-decoration: none; }
+
+  /* =========================  CITATION  ========================= */
+  pre.bibtex {
+    background: #fafafa;
+    border: 1px solid var(--rule);
+    padding: 20px 22px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    overflow-x: auto;
+    margin-top: 16px;
+    position: relative;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .copy-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* =========================  FOOTER  ========================= */
+  footer {
+    padding: 48px 0 64px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    border-top: 1px solid var(--rule);
+    margin-top: 28px;
+  }
+  footer a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  footer a:hover { color: var(--muted); }
+
+  @media (max-width: 600px) {
+    header.hero { padding: 44px 0 20px; }
+    section { padding: 32px 0; }
+    .links a { padding: 9px 16px; font-size: 13.5px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="conference">UCSB Senior Capstone · Spring 2026</span>
+
+    <h1 class="title">
+      VistaVisio
+      <span class="sub-line">An Immersive 3D Reconstruction of the UCSB Campus</span>
+    </h1>
+
+    <p class="tagline">drone &amp; ground imagery · centimeter-accurate RTK GPS · 3D Gaussian Splatting</p>
+
+    <p class="authors">
+      <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#777;display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">Computer Engineering</span>
+      Ari Jacobs, Jeffery Wang, Saul Diaz, Kevin Hernandez, Guntash Gill
+    </p>
+    <p class="authors" style="margin-top:10px;">
+      <span style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#777;display:block;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">Electrical Engineering</span>
+      Preston Tran, Nathan Nhieu, Jason Li, Joshua Liu
+    </p>
+    <p class="affil">University of California, Santa Barbara</p>
+
+    <div class="links">
+      <a href="3D_Virtual_UCSB___Milestone_4_Prelim.pdf" target="_blank" rel="noopener"><i class="fa-solid fa-file-pdf"></i> Design Doc</a>
+      <a href="https://github.com/Ari-Jacobs/VistaVisio" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Code</a>
+      <a href="#reconstructions"><i class="fa-solid fa-cube"></i> Live Splats and Point Cloud Videos</a>
+      <a href="#method"><i class="fa-solid fa-diagram-project"></i> Method</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     TEASER
+     ============================================================ -->
+<div class="wrap">
+  <div class="teaser">
+    <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+      <source src="videos/bus_loop_cut.mp4" type="video/mp4">
+    </video>
+  </div>
+  <p class="caption">A fly-through of the merged Gaussian splat across UCSB.</p>
+</div>
+
+<!-- ============================================================
+     WHY VISTAVISIO  —  background + solution
+     ============================================================ -->
+<section id="why">
+  <div class="wrap narrow">
+    <h2 class="section-title">Why VistaVisio?</h2>
+
+    <div class="two-col">
+      <div>
+        <span class="col-tag">The Problem</span>
+        <h3>UCSB has no immersive viewer of campus.</h3>
+        <p>
+          Google Earth offers 360° panoramas only at fixed street-level points. GoGaucho provides classroom
+          search but lacks visual context and only shows a bird's-eye projection. Prospective students
+          across the country and around the world rely on these limited tools to understand a place
+          they may not have the time or money to visit in person — and current students often spend
+          their first weeks lost between buildings they've never seen at ground level.
+        </p>
+      </div>
+
+      <div>
+        <span class="col-tag">Our Solution</span>
+        <h3>An immersive, spatially-accurate 3D model.</h3>
+        <p>
+          VistaVisio lets users explore and navigate UCSB as if they were actually there — in a
+          web browser or through virtual reality on Apple Vision Pro. By preserving both visual
+          fidelity and real-world scale, aligned to geographic coordinates, the platform delivers an
+          experience that satellite imagery and street-view tools cannot. Students, professors, and
+          visitors can walk campus from anywhere, at any time.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============================================================
+     ABSTRACT
+     ============================================================ -->
+<section id="abstract">
+  <div class="wrap narrow">
+    <h2 class="section-title">Abstract</h2>
+    <p>
+      VistaVisio develops an interactive, high-fidelity 3D reconstruction of the UCSB campus
+      accessible through web browsers and virtual reality headsets. Existing tools such as
+      Google Maps offer limited ground-level campus visualization, creating barriers for
+      prospective students, visitors, researchers, and event planners seeking to explore the
+      environment remotely. The system processes thousands of high-quality ground and aerial
+      images paired with centimeter-accurate GPS metadata from EMLID Rx2 receivers through a
+      three-stage pipeline: dataset filtering, Structure-from-Motion (SfM), and Multi-View
+      Stereo (MVS). The resulting model enables immersive virtual tours of the campus,
+      providing a detailed, accessible alternative to physical site visits and establishing a
+      scalable framework for future campus mapping and spatial analysis.
+    </p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============================================================
+     METHOD OVERVIEW
+     ============================================================ -->
+<section id="method">
+  <div class="wrap narrow">
+    <h2 class="section-title">Method overview</h2>
+    <p>
+      Images are captured per-building using iPhones mounted alongside EMLID Rx2 RTK GPS
+      receivers (centimeter-level accuracy) and supplemented with aerial imagery from Wingtra
+      and DJI drones. Each batch passes through a privacy and quality filter — face and license
+      plate blurring via fine-tuned YOLO models, blur detection by Laplacian variance, exposure
+      validation by histogram analysis, and SegFormer-based sky segmentation to suppress
+      sky-region keypoints.
+    </p>
+    <p>
+      The cleaned dataset feeds a hybrid HLOC + COLMAP Structure-from-Motion pipeline:
+      SuperPoint extracts dense, repeatable keypoints; SuperGlue's attention-based matcher
+      produces geometrically consistent correspondences; COLMAP handles geometric verification,
+      incremental registration, triangulation, and bundle adjustment, with GPS coordinates
+      injected as pose priors. We use the Umeyama algorithm with RANSAC to align per-building
+      reconstructions into a shared geo-referenced frame.
+    </p>
+    <p>
+      For dense reconstruction we use gsplat for the majority of campus and GaussianPlant for
+      vegetation-heavy regions like the lawns and tree canopies. Per-building splats are merged
+      into the global coordinate frame using GPS alignment, with low-opacity and oversized
+      Gaussians filtered out and a 0.05 m voxel-grid pruning step to remove duplicates in
+      overlap regions. The final model is delivered to users through a Unity WebGL viewer and 
+      through a third-party app (MetalSplat) for Apple Vision Pro.
+    </p>
+
+    <!-- Pipeline diagram -->
+    <div class="pipeline">
+      <div class="step">
+        <span class="num">01</span>
+        <span class="label">Capture</span>
+        <span class="tool">iPhone + EMLID Rx2 · Wingtra · DJI</span>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <span class="label">Filter</span>
+        <span class="tool">YOLO · Laplacian · SegFormer</span>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <span class="label">SfM</span>
+        <span class="tool">HLOC + COLMAP<br/>SuperPoint · SuperGlue</span>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <span class="label">Splat</span>
+        <span class="tool">gsplat · GaussianPlant</span>
+      </div>
+      <div class="step">
+        <span class="num">05</span>
+        <span class="label">Render</span>
+        <span class="tool">Unity WebGL · Vision Pro</span>
+      </div>
+    </div>
+    <p class="caption">Five-stage pipeline from raw capture to interactive viewer.</p>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============================================================
+     STATS BAND
+     ============================================================ -->
+<section style="padding-top: 28px; padding-bottom: 12px;">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><span class="num">9</span><span class="lbl">Team Members</span></div>
+      <div class="stat"><span class="num">25+</span><span class="lbl">Buildings Captured</span></div>
+      <div class="stat"><span class="num">~1 cm</span><span class="lbl">RTK GPS Accuracy</span></div>
+      <div class="stat"><span class="num">0.29 m</span><span class="lbl">Merged Alignment Error</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     RECONSTRUCTION GALLERY
+     ============================================================ -->
+<section id="reconstructions">
+  <div class="wrap">
+    <div class="narrow" style="margin-bottom: 16px;">
+      <h2 class="section-title">Interactive reconstructions</h2>
+      <p>
+        Click any building to open its interactive Gaussian splat viewer. Rendering runs
+        entirely in your browser via WebGL; first load may take a few seconds while the
+        compressed splat streams in.
+      </p>
+    </div>
+
+    <div class="gallery">
+
+      <!-- ── GAUSSIAN SPLATS ──────────────────────────────────── -->
+
+      <article class="card">
+        <div class="thumb">
+          <img src="img/kitp.png" alt="Kavli Institute (KITP)">
+          <span class="status">Gaussian Splat</span>
+        </div>
+        <div class="card-body">
+          <h3>Kavli Institute (KITP)</h3>
+          <p class="meta">3DGS · GROUND CAPTURE</p>
+          <p class="desc">Full Gaussian splat of KITP's distinctive courtyard complex, reconstructed from ground-level imagery.</p>
+          <a class="open" href="https://splatter.app/s/us6-756" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <img src="img/hfh_mrl.png" alt="Harold Frank Hall and MRL">
+          <span class="status">Gaussian Splat</span>
+        </div>
+        <div class="card-body">
+          <h3>Harold Frank Hall &amp; MRL</h3>
+          <p class="meta">3DGS · MERGED · GROUND CAPTURE</p>
+          <p class="desc">Merged Gaussian splat of Harold Frank Hall and the Materials Research Lab, two of the core engineering buildings on campus.</p>
+          <a class="open" href="https://splatter.app/s/x6v-4l8" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <img src="img/drone_east.png" alt="East Campus Drone">
+          <span class="status">Gaussian Splat</span>
+        </div>
+        <div class="card-body">
+          <h3>East Campus (Drone)</h3>
+          <p class="meta">3DGS · AERIAL CAPTURE</p>
+          <p class="desc">Aerial Gaussian splat of the east side of campus captured from drone imagery, covering rooftops and building exteriors not visible from the ground.</p>
+          <a class="open" href="https://splatter.app/s/phf-mg9" target="_blank" rel="noopener">Open viewer <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </article>
+
+      <!-- ── POINT CLOUDS ─────────────────────────────────────── -->
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/drone_east_walk_cut.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>East Side of Campus</h3>
+          <p class="meta">SPARSE · COLMAP</p>
+          <p class="desc">Sparse point cloud reconstruction using Wingtra drone footage of East Side of Campus.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/drone_sparse.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>Entire Campus</h3>
+          <p class="meta">SPARSE · COLMAP</p>
+          <p class="desc">Sparse point cloud reconstruction of all Wingtra drone flight paths and most buildings we collected ground-level + DJI drone data for.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="thumb">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
+            <source src="videos/kitp_cut.mp4" type="video/mp4">
+          </video>
+          <span class="status">Point Cloud</span>
+        </div>
+        <div class="card-body">
+          <h3>Point Cloud 3</h3>
+          <p class="meta">DENSE · COLMAP</p>
+          <p class="desc">Dense point cloud reconstruction of Kavli Institude of Theoretical Physics.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============================================================
+     BIBTEX CITATION
+     ============================================================ -->
+<section id="citation">
+  <div class="wrap narrow">
+    <h2 class="section-title">Citation</h2>
+    <pre class="bibtex" id="bibtex"><button class="copy-btn" onclick="copyBibtex()">Copy</button>@misc{vistavisio2026,
+  title  = {VistaVisio: An Immersive 3D Reconstruction of the UCSB Campus},
+  author = {Jacobs, Ari and Wang, Jeffery and Diaz, Saul and Hernandez, Kevin and Gill, Guntash and Tran, Preston and Nhieu, Nathan and Li, Jason and Liu, Joshua},
+  year   = {2026},
+  note   = {Senior capstone project, University of California, Santa Barbara},
+  url    = {https://your-user.github.io/vistavisio}
+}</pre>
+  </div>
+</section>
+
+<div class="rule"></div>
+
+<!-- ============================================================
+     ACKNOWLEDGEMENTS
+     ============================================================ -->
+<section id="acks">
+  <div class="wrap narrow">
+    <h2 class="section-title">Acknowledgements</h2>
+    <p>
+      We thank Professor B.S. Manjunath, Chandrakanth Gudavalli, Charvi Mendiratta, Prof. Yoga Isukapalli, 
+      Prof. Ilan Ben-Yaacov, the UCSB ML Lab, and many more for providing resources and support throughout
+      this project. We are grateful to UCSB ECE Department and IFT for supporting equipment costs, 
+      including the EMLID Rx2 RTK GPS receiver and the Apple Vision Pro headset used for VR deployment.
+    </p>
+    <p>
+      VistaVisio builds on a broad ecosystem of open-source work, including
+      <a href="https://colmap.github.io/" target="_blank" rel="noopener">COLMAP</a>,
+      <a href="https://github.com/cvg/Hierarchical-Localization" target="_blank" rel="noopener">HLOC</a>,
+      <a href="https://github.com/magicleap/SuperGluePretrainedNetwork" target="_blank" rel="noopener">SuperPoint &amp; SuperGlue</a>,
+      <a href="https://github.com/nerfstudio-project/gsplat" target="_blank" rel="noopener">gsplat</a>, and
+      <a href="https://arxiv.org/abs/2512.14087" target="_blank" rel="noopener">GaussianPlant</a>.
+    </p>
+    <p style="font-size: 14px; color: var(--muted); margin-top: 18px;">
+      Page template inspired by <a href="https://reconfusion.github.io/" target="_blank" rel="noopener">ReconFusion</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="wrap">
+    <p>© 2026 VistaVisio Team · UC Santa Barbara · <a href="https://github.com/Ari-Jacobs/VistaVisio">Source on GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+  function copyBibtex() {
+    const pre = document.getElementById('bibtex');
+    const text = pre.innerText.replace(/^Copy\s*/, '');
+    navigator.clipboard.writeText(text);
+    const btn = pre.querySelector('.copy-btn');
+    const original = btn.innerText;
+    btn.innerText = 'Copied!';
+    setTimeout(() => { btn.innerText = original; }, 1400);
+  }
+</script>
+
+</body>
+</html>
